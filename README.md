@@ -18,11 +18,15 @@ ProgrammingLanguageConceptsProject
 
 ### statements
 
-1. variable declaration	(var variable) or (var variable value) : *cade*
-2. assignment	(= variable expression) *cade*
-3. return	(return expression) *Xiangyi*
-4. if statement	(if conditional then-statement optional-else-statement) *Xiangyi/Zora*
-5. while statement	(while conditional body-statement) *Xiangyi* 
+1. **variable declaration**	(var variable) or (var variable value) : *cade*
+2. **assignment**	(= variable expression) *cade*
+3. **return**	(return expression) *Xiangyi*
+4. **if statement**	(if conditional then-statement optional-else-statement) *Xiangyi/Zora*
+5. **while statement**	(while conditional body-statement) *Xiangyi* 
+
+### State 
+
+- use **abstraction** to separate your state from the rest of your interpreter. As we increase the number of language features we have in future parts of the project, we will need to change how the state is implemented. If you correctly use abstraction, you will be able to redesign the state without changing the implementation of your interpreter. In this case, that means that the interpreter does not know about the structure of the state. Instead, you have generic functions that the interpreter can call to manipulate the state.
 
 ### Special notes for those who have not used github 
 
