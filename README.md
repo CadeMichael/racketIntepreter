@@ -22,7 +22,7 @@ ProgrammingLanguageConceptsProject
 2. **assignment**	(= variable expression) *cade*
 3. **return**	(return expression) *Xiangyi*
 4. **if statement**	(if conditional then-statement optional-else-statement) *Xiangyi/Zora*
-5. **while statement**	(while conditional body-statement) *Xiangyi* 
+5. **while statement**	(while conditional body-statement) *Zora* 
 
 ### State 
 
