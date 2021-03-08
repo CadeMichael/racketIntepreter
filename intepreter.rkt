@@ -1,4 +1,4 @@
-; Cade Lueker, Zora Li, Xiangyi 
+; Cade Lueker, Zora Li, Xiangyi Zhang
 
 (require "simpleParser.rkt")
 
@@ -7,29 +7,23 @@
   (lambda (expresssion state)
     (cond
      ; make helper functions for each case
-     ((eq? 'var (car expression)) ) ; declaration ---> Cade
-     ((eq '= (car expression))) ; assignment ---> Cade
+     ((eq? 'var (car expression)) (M_declaration expression state)) ; declaration ---> Cade
+     ((eq? '= (car expression)) (M_assign expression state)) ; assignment ---> Cade
      ((eq? 'return (car expression)) (M_value (cdr expression) state)) ; return 
      ((eq? 'while (car expression)) (M_while (cdr expression) state))  ; while
      ((eq? 'if (car expression)) (M_if (cdr expression) state)) ; if 
      ())))
 
-;(define M_return
-;  (lambda (expression state)
-;    (M_v))
 
-(define M_declaration
-  (lambda (expression state)
-    (cond
-      ((eq? (cdr expression) null) (add (remove state (car expression)) (car expression) '()))
-      ((eq? (car expression) '=) (M_assign (cdr expression) state)))))
-
+;Abstraction for M_assign
+(define assign_var cadr)
+(define assign_val caddr)
 
 (define M_assign
   (lambda (expression state)
-    (if(number? (cadr expression))
-       (add (remove state (car expression)) (car expression) (cadr expression))
-       (add (remove state (car expression)) (car expression) (M_value (cadr expression) state)))))
+    (if(number? (assign_var expression))
+       (add (remove state (assign_var expression)) (assign_var expression) (assign_val expression))
+       (add (remove state (assign_var expression)) (assign_var expression) (M_value (assign_val expression) state)))))
 
 
 
@@ -65,17 +59,6 @@
 (define leftoperand cadr)
 (define rightoperand caddr)
 
-(define M_name ; ----> Cade
-  (lambda (variable)
-    (cond
-     () 
-     )))
-
-(define M_value
-  (lambda (assignment state)
-    (cond
-     ()
-     ())))
 
 (define M_boolean
   (lambda (condition state)
