@@ -2,26 +2,6 @@
 
 (require "simpleParser.rkt")
 
-
-; M-integer maps expressions to integer values
-; (M-integer '(* (+ 4 3) (- 2 1))  => 7
-; operators +, -, *, /, %
-(define M-integer
-  (lambda (expression)
-    (cond
-      ((number? expression) expression)
-      ((eq? (operator expression) '+) (+ (M-integer (leftoperand expression)) (M-integer (rightoperand expression))))
-      ((eq? (operator expression) '-) (- (M-integer (leftoperand expression)) (M-integer (rightoperand expression))))
-      ((eq? (operator expression) '*) (* (M-integer (leftoperand expression)) (M-integer (rightoperand expression))))
-      ((eq? (operator expression) '/) (quotient (M-integer (leftoperand expression)) (M-integer (rightoperand expression))))
-      ((eq? (operator expression) '%) (remainder (M-integer (leftoperand expression)) (M-integer (rightoperand expression))))
-      (else (error 'bad-operator)))))
-
-; ABSTRACTION
-(define operator car)
-(define leftoperand cadr)
-(define rightoperand caddr)
-
 ; state management function 
 (define M_state
   (lambda (expresssion state)
@@ -42,9 +22,23 @@
 
 
 ; helper functions 
-(define M_int ; -----> Cade
-  (lambda (expression) ; does this need state?
-    ()))
+
+; operators +, -, *, /, %
+(define M-integer
+  (lambda (expression)
+    (cond
+      ((number? expression) expression)
+      ((eq? (operator expression) '+) (+ (M-integer (leftoperand expression)) (M-integer (rightoperand expression))))
+      ((eq? (operator expression) '-) (- (M-integer (leftoperand expression)) (M-integer (rightoperand expression))))
+      ((eq? (operator expression) '*) (* (M-integer (leftoperand expression)) (M-integer (rightoperand expression))))
+      ((eq? (operator expression) '/) (quotient (M-integer (leftoperand expression)) (M-integer (rightoperand expression))))
+      ((eq? (operator expression) '%) (remainder (M-integer (leftoperand expression)) (M-integer (rightoperand expression))))
+      (else (error 'bad-operator)))))
+
+; M_integer abstraction
+(define operator car)
+(define leftoperand cadr)
+(define rightoperand caddr)
 
 (define M_name ; ----> Cade
   (lambda (variable)
@@ -74,11 +68,24 @@
       ((eq? '! (car condition)) (if(M_boolean (cadr condition) state) #f #t))
        )))
 
-(define add ; ---> Cade
-  (lambda (variable value state)))
+;state abstractions 
+(define vars car)
+(define vals cadr)
 
-(define remove ; ---> Cade
-  (lambda (variable state)))
+; add with list of two lists 
+(define add 
+  (lambda (s variable value)
+    (cons (cons variable (vars s)) (list (cons value (vals s))))))
+
+; remove with list of two lists
+(define remove 
+  (lambda (s variable)
+    (cond 
+     ((null? (vars s)) '(()()))
+     ((eq? (car (vars s)) variable) (cons (cdr (vars s))(list (cdr (vals s)))))
+     (else (cons 
+            (cons (car (vars s))(vars (remove (cons (cdr (vars s))(list (cdr (vals s)))) variable)))
+            (list (cons (car (vals s))(vals (remove (cons (cdr (vars s))(list (cdr (vals s)))) variable)))))))))
 
 ; main function that handles the parsing of the test file
 (define interpret
