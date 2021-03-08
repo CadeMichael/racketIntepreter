@@ -13,7 +13,7 @@
      ; make helper functions for each case
      ((eq? 'var (car expression)) (M_declaration expression state)) ; declaration ---> Cade
      ((eq? '= (car expression)) (M_assign expression state)) ; assignment ---> Cade
-     ((eq? 'return (car expression)) (M_value (cdr expression) state)) ; return 
+     ((eq? 'return (car expression)) (M_value (cadr expression) state)) ; return 
      ((eq? 'while (car expression)) (M_while (cdr expression) state))  ; while
      ((eq? 'if (car expression)) (M_if (cdr expression) state)))))
 
@@ -96,11 +96,11 @@
     (cond
       ((eq? condition #t) #t)
       ((eq? condition #f) #f)
-      ((eq? '== (car condition)) (if(eq? (cadr condition) (caddr condition)) #t #f))
-      ((eq? '!= (car condition)) (if(eq? (cadr condition) (caddr condition)) #f #t))
-      ((eq? '< (car condition)) (if(< (cadr condition) (caddr condition)) #t #f))
-      ((eq? '> (car condition)) (if(> (cadr condition) (caddr condition)) #t #f))
-      ((eq? '<= (car condition)) (if(<= (cadr condition) (caddr condition)) #t #f))
+      ((eq? '== (car condition)) (if(eq? (M_value (cadr condition) state) (M_value (caddr condition) state)) #t #f))
+      ((eq? '!= (car condition)) (if(eq? (M_value (cadr condition) state) (M_value (caddr condition) state)) #f #t))
+      ((eq? '< (car condition)) (if(< (M_value(cadr condition) state) (M_value (caddr condition) state)) #t #f))
+      ((eq? '> (car condition)) (if(> (M_value (cadr condition) state) (M_value (caddr condition) state)) #t #f))
+      ((eq? '<= (car condition)) (if(<= (M_value (cadr condition) state) (M_value (caddr condition) state)) #t #f))
       ((eq? '>= (car condition)) (if(>= (cadr condition) (caddr condition)) #t #f))
       ((eq? '&& (car condition)) (if(M_boolean (cadr condition) state) (if(M_boolean (caddr condition) state) #t #f) #f))
       ((eq? '|| (car condition)) (if(M_boolean (cadr condition) state) #t (if(M_boolean (caddr condition) state) #t #f)))
@@ -128,8 +128,7 @@
 
 ; main function that handles the parsing of the test file
 (define interpret
-  (lambda (parse state)
+  (lambda (parse s)
     (cond
-     ((null? (cdr parse)) '())
-     ((null? (parse)) '())
-     (else (interpret (cdr parse) (M_state (car parse)))))))
+     ((null? parse) s)
+     (else (interpret (cdr parse) (M_state (car parse) s))))))
