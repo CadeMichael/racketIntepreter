@@ -27,21 +27,34 @@
   (lambda (expresssion state)
     (cond
      ; make helper functions for each case
-     ((eq? 'var (car expression))) ; declaration ---> Cade
+     ((eq 'var (car expression))) ; declaration ---> Cade
      ((eq '= (car expression))) ; assignment ---> Cade
      ((eq 'return (car expression))) ; return 
      () ; while
      () ; if 
      ())))
+  
+; ------------ helper functions --------------
 
-(define M_if
-  (lambda (expression state)
-    (if(M_boolean (car expression) state)
-       (M_state (cadr expression) state)
-       (M_state (caddr expression) state))))
+;state abstractions 
+(define vars car)
+(define vals cadr)
 
+; add with list of two lists 
+(define add 
+  (lambda (s variable value)
+    (cons (cons variable (vars s)) (list (cons value (vals s))))))
 
-; helper functions 
+; remove with list of two lists
+(define remove 
+  (lambda (s variable)
+    (cond 
+     ((null? (vars s)) '(()()))
+     ((eq? (car (vars s)) variable) (cons (cdr (vars s))(list (cdr (vals s)))))
+     (else (cons 
+            (cons (car (vars s))(vars (remove (cons (cdr (vars s))(list (cdr (vals s)))) variable)))
+            (list (cons (car (vals s))(vals (remove (cons (cdr (vars s))(list (cdr (vals s)))) variable)))))))))
+
 (define M_int ; -----> Cade
   (lambda (expression) ; does this need state?
     ()))
@@ -60,19 +73,7 @@
 
 (define M_boolean
   (lambda (condition state)
-    (cond
-      ((eq? condition #t) #t)
-      ((eq? condition #f) #f)
-      ((eq? '== (car condition)) (if(eq? (cadr condition) (caddr condition)) #t #f))
-      ((eq? '!= (car condition)) (if(eq? (cadr condition) (caddr condition)) #f #t))
-      ((eq? '< (car condition)) (if(< (cadr condition) (caddr condition)) #t #f))
-      ((eq? '> (car condition)) (if(> (cadr condition) (caddr condition)) #t #f))
-      ((eq? '<= (car condition)) (if(<= (cadr condition) (caddr condition)) #t #f))
-      ((eq? '>= (car condition)) (if(>= (cadr condition) (caddr condition)) #t #f))
-      ((eq? '&& (car condition)) (if(M_boolean (cadr condition) state) (if(M_boolean (caddr condition) state) #t #f) #f))
-      ((eq? '|| (car condition)) (if(M_boolean (cadr condition) state) #t (if(M_boolean (caddr condition) state) #t #f)))
-      ((eq? '! (car condition)) (if(M_boolean (cadr condition) state) #f #t))
-       )))
+    (cond)))
 
 (define add ; ---> Cade
   (lambda (variable value state)))
