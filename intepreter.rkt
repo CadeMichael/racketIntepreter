@@ -7,12 +7,37 @@
   (lambda (expresssion state)
     (cond
      ; make helper functions for each case
-     ((eq? 'var (car expression))) ; declaration ---> Cade
+     ((eq? 'var (car expression)) ) ; declaration ---> Cade
      ((eq '= (car expression))) ; assignment ---> Cade
-     ((eq 'return (car expression))) ; return 
-     () ; while
-     () ; if 
+     ((eq? 'return (car expression)) (M_value (cdr expression) state)) ; return 
+     ((eq? 'while (car expression)) (M_while (cdr expression) state))  ; while
+     ((eq? 'if (car expression)) (M_if (cdr expression) state)) ; if 
      ())))
+
+;(define M_return
+;  (lambda (expression state)
+;    (M_v))
+
+(define M_declaration
+  (lambda (expression state)
+    (cond
+      ((eq? (cdr expression) null) (add (remove state (car expression)) (car expression) '()))
+      ((eq? (car expression) '=) (M_assign (cdr expression) state)))))
+
+
+(define M_assign
+  (lambda (expression state)
+    (if(number? (cadr expression))
+       (add (remove state (car expression)) (car expression) (cadr expression))
+       (add (remove state (car expression)) (car expression) (M_value (cadr expression) state)))))
+
+
+
+(define M_while
+  (lambda (expression state)
+    (if(M_boolean (car expression) state)
+       (M_while expression (M_state (cdr expression) state))
+       (state))))
 
 (define M_if
   (lambda (expression state)
