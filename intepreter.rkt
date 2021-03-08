@@ -34,7 +34,27 @@
      () ; if 
      ())))
   
-; helper functions 
+; ------------ helper functions --------------
+
+;state abstractions 
+(define vars car)
+(define vals cadr)
+
+; add with list of two lists 
+(define add 
+  (lambda (s variable value)
+    (cons (cons variable (vars s)) (list (cons value (vals s))))))
+
+; remove with list of two lists
+(define remove 
+  (lambda (s variable)
+    (cond 
+     ((null? (vars s)) '(()()))
+     ((eq? (car (vars s)) variable) (cons (cdr (vars s))(list (cdr (vals s)))))
+     (else (cons 
+            (cons (car (vars s))(vars (remove (cons (cdr (vars s))(list (cdr (vals s)))) variable)))
+            (list (cons (car (vals s))(vals (remove (cons (cdr (vars s))(list (cdr (vals s)))) variable)))))))))
+
 (define M_int ; -----> Cade
   (lambda (expression) ; does this need state?
     ()))
