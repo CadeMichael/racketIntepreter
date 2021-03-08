@@ -2,6 +2,10 @@
 
 (require "simpleParser.rkt")
 
+(define (atom? x)
+  (and (not (null? x))
+       (not (pair? x))))
+
 ; state management function 
 (define M_state
   (lambda (expresssion state)
@@ -25,14 +29,15 @@
 
 ; operators +, -, *, /, %
 (define M-integer
-  (lambda (expression)
+  (lambda (expression s)
     (cond
       ((number? expression) expression)
-      ((eq? (operator expression) '+) (+ (M-integer (leftoperand expression)) (M-integer (rightoperand expression))))
-      ((eq? (operator expression) '-) (- (M-integer (leftoperand expression)) (M-integer (rightoperand expression))))
-      ((eq? (operator expression) '*) (* (M-integer (leftoperand expression)) (M-integer (rightoperand expression))))
-      ((eq? (operator expression) '/) (quotient (M-integer (leftoperand expression)) (M-integer (rightoperand expression))))
-      ((eq? (operator expression) '%) (remainder (M-integer (leftoperand expression)) (M-integer (rightoperand expression))))
+      ((atom? expression) (get_var_value expression s))
+      ((eq? (operator expression) '+) (+ (M-integer (leftoperand expression) s) (M-integer (rightoperand expression) s)))
+      ((eq? (operator expression) '-) (- (M-integer (leftoperand expression) s) (M-integer (rightoperand expression) s)))
+      ((eq? (operator expression) '*) (* (M-integer (leftoperand expression) s) (M-integer (rightoperand expression) s)))
+      ((eq? (operator expression) '/) (quotient (M-integer (leftoperand expression) s) (M-integer (rightoperand expression) s)))
+      ((eq? (operator expression) '%) (remainder (M-integer (leftoperand expression) s) (M-integer (rightoperand expression) s)))
       (else (error 'bad-operator)))))
 
 ; M_integer abstraction
@@ -40,17 +45,29 @@
 (define leftoperand cadr)
 (define rightoperand caddr)
 
-(define M_name ; ----> Cade
-  (lambda (variable)
+(define get_var_value
+  (lambda (var s)
     (cond
-     () 
-     )))
+        ((null? (vars s)) (error "variable not assigned"))
+        ((eq? (car (vars s)) var) (if (eq? (car (vals s))  '()) (error "var not assigned value") (car (vals s))))
+        (else (get_var_value var (cons (cdr (vars s))(list (cdr (vals s)))))))))
 
 (define M_value
-  (lambda (assignment state)
+  (lambda (expression s)
+    (cond 
+     ((null? expression) '())
+     (else (M-integer expression s)))))
+
+(define M_declaration
+  (lambda (expression s)
     (cond
-     ()
-     ())))
+      ((eq? (declr-assign expression) null) (add (remove s (declr-var expression)) (declr-var expression) '()))
+      (else (add 
+             (remove s (declr-var expression)) (declr-var expression) (M_value (car (declr-assign expression)) s))))))
+
+; abstractions for declaration
+(define declr-var cadr)
+(define declr-assign cddr)
 
 (define M_boolean
   (lambda (condition state)
