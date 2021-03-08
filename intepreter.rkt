@@ -1,22 +1,21 @@
 ; Cade Lueker, Zora Li, Xiangyi Zhang
+#lang racket
 
 (require "simpleParser.rkt")
-
 (define (atom? x)
   (and (not (null? x))
        (not (pair? x))))
 
 ; state management function 
 (define M_state
-  (lambda (expresssion state)
+  (lambda (expression state)
     (cond
      ; make helper functions for each case
      ((eq? 'var (car expression)) (M_declaration expression state)) ; declaration ---> Cade
      ((eq? '= (car expression)) (M_assign expression state)) ; assignment ---> Cade
      ((eq? 'return (car expression)) (M_value (cdr expression) state)) ; return 
      ((eq? 'while (car expression)) (M_while (cdr expression) state))  ; while
-     ((eq? 'if (car expression)) (M_if (cdr expression) state)) ; if 
-     ())))
+     ((eq? 'if (car expression)) (M_if (cdr expression) state)))))
 
 ;(define M_return
 ;  (lambda (expression state)
