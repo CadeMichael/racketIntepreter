@@ -22,12 +22,6 @@
 ;  (lambda (expression state)
 ;    (M_v))
 
-(define M_declaration
-  (lambda (expression state)
-    (cond
-      ((eq? (cdr expression) null) (add (remove state (car expression)) (car expression) '()))
-      ((eq? (car expression) '=) (M_assign (cdr expression) state)))))
-
 
 (define M_assign
   (lambda (expression state)
