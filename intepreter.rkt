@@ -2,6 +2,7 @@
 #lang racket
 
 (require "simpleParser.rkt")
+
 (define (atom? x)
   (and (not (null? x))
        (not (pair? x))))
@@ -14,7 +15,7 @@
      ((eq? 'var (car expression)) (M_declaration expression state)) ; declaration ---> Cade
      ((eq? '= (car expression)) (M_assign expression state)) ; assignment ---> Cade
      ((eq? 'return (car expression)) (M_value (cadr expression) state)) ; return 
-     ((eq? 'while (car expression)) (M_while (cdr expression) state))  ; while
+     ((eq? 'while (car expression)) (M_while expression state))  ; while
      ((eq? 'if (car expression)) (M_if expression state)))))
 
 ;(define M_return
@@ -32,13 +33,15 @@
        (add (remove state (assign_var expression)) (assign_var expression) (assign_val expression))
        (add (remove state (assign_var expression)) (assign_var expression) (M_value (assign_val expression) state)))))
 
-
+;abstractions for while
+(define while_condition cadr)
+(define while_body caddr)
 
 (define M_while
   (lambda (expression state)
-    (if(M_boolean (car expression) state)
-       (M_while expression (M_state (cdr expression) state))
-       (state))))
+    (if(M_boolean (while_condition expression) state)
+       (M_while expression (M_state (while_body expression) state))
+       state)))
 
 ;abstractions for if
 (define if_condition cadr)
@@ -150,3 +153,5 @@
     (cond
      ((null? parse) s)
      (else (interpret (cdr parse) (M_state (car parse) s))))))
+
+(interpret (parser "testFile.txt") '(()()))
