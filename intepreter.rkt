@@ -39,7 +39,7 @@
 
 (define M_while
   (lambda (expression state)
-    (if(M_boolean (while_condition expression) state)
+    (if(eq? 'true (M_boolean (while_condition expression) state))
        (M_while expression (M_state (while_body expression) state))
        state)))
 
@@ -50,9 +50,9 @@
 
 (define M_if
   (lambda (expression state)
-    (if(M_boolean (if_condition expression) state)
+    (if(eq? 'true (M_boolean (if_condition expression) state))
        (M_state (if_body expression) state)
-       (if(null? (if_else expression))
+       (if(null? (cdddr expression))
           state
           (M_state (if_else expression) state)))))
 
@@ -122,7 +122,7 @@
       ((eq? '< (operator condition)) (if(< (M_value(leftcond condition) state) (M_value (rightcond condition) state)) 'true 'false))
       ((eq? '> (operator condition)) (if(> (M_value (leftcond condition) state) (M_value (rightcond condition) state)) 'true 'false))
       ((eq? '<= (operator condition)) (if(<= (M_value (leftcond condition) state) (M_value (rightcond condition) state)) 'true 'false))
-      ((eq? '>= (operator condition)) (if(>= (cadr condition) (caddr condition)) 'true 'false))
+      ((eq? '>= (operator condition)) (if(>= (M_value (leftcond condition) state) (M_value (rightcond condition) state)) 'true 'false))
       ((eq? '&& (operator condition))(if(eq? 'true (M_value (leftcond condition) state)) (if(eq? 'true (M_value (rightcond condition) state)) 'true 'false) 'false))
       ((eq? '|| (operator condition))(if(eq? 'true (M_value (leftcond condition) state)) 'true (if(eq? 'true (M_value (rightcond condition) state)) 'true 'false)))
       ((eq? '! (operator condition)) (if(eq? 'true (M_value (leftcond condition) state)) 'false 'true))
