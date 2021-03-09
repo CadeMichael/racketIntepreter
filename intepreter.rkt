@@ -15,7 +15,7 @@
      ((eq? '= (car expression)) (M_assign expression state)) ; assignment ---> Cade
      ((eq? 'return (car expression)) (M_value (cadr expression) state)) ; return 
      ((eq? 'while (car expression)) (M_while (cdr expression) state))  ; while
-     ((eq? 'if (car expression)) (M_if (cdr expression) state)))))
+     ((eq? 'if (car expression)) (M_if expression state)))))
 
 ;(define M_return
 ;  (lambda (expression state)
@@ -40,11 +40,18 @@
        (M_while expression (M_state (cdr expression) state))
        (state))))
 
+;abstractions for if
+(define if_condition cadr)
+(define if_body caddr)
+(define if_else cadddr)
+
 (define M_if
   (lambda (expression state)
-    (if(M_boolean (car expression) state)
-       (M_state (cadr expression) state)
-       (M_state (caddr expression) state))))
+    (if(M_boolean (if_condition expression) state)
+       (M_state (if_body expression) state)
+       (if(null? (if_else expression))
+          state
+          (M_state (if_else expression) state)))))
 
 
 ; helper functions 
