@@ -60,13 +60,11 @@
 (define M-integer
   (lambda (expression s)
     (cond
-      ((number? expression) expression)
-      ((atom? expression) (get_var_value expression s))
-      ((eq? (operator expression) '+) (+ (M-integer (leftoperand expression) s) (M-integer (rightoperand expression) s)))
-      ((eq? (operator expression) '-) (- (M-integer (leftoperand expression) s) (M-integer (rightoperand expression) s)))
-      ((eq? (operator expression) '*) (* (M-integer (leftoperand expression) s) (M-integer (rightoperand expression) s)))
-      ((eq? (operator expression) '/) (quotient (M-integer (leftoperand expression) s) (M-integer (rightoperand expression) s)))
-      ((eq? (operator expression) '%) (remainder (M-integer (leftoperand expression) s) (M-integer (rightoperand expression) s)))
+      ((eq? (operator expression) '+) (+ (M_value (leftoperand expression) s) (M_value (rightoperand expression) s)))
+      ((eq? (operator expression) '-) (- (M_value (leftoperand expression) s) (M_value (rightoperand expression) s)))
+      ((eq? (operator expression) '*) (* (M_value (leftoperand expression) s) (M_value (rightoperand expression) s)))
+      ((eq? (operator expression) '/) (quotient (M_value (leftoperand expression) s) (M_value (rightoperand expression) s)))
+      ((eq? (operator expression) '%) (remainder (M_value (leftoperand expression) s) (M_value (rightoperand expression) s)))
       (else (error 'bad-operator)))))
 
 ; M_integer abstraction
@@ -85,6 +83,19 @@
   (lambda (expression s)
     (cond 
      ((null? expression) '())
+     ((number? expression) expression)
+     ((eq? expression 'true) 'true)
+     ((eq? expression 'false) 'false)
+     ((atom? expression) (get_var_value expression s))
+     ((eq? '== (car expression)) (M_boolean expression s))
+     ((eq? '!= (car expression)) (M_boolean expression s))
+     ((eq? '! (car expression)) (M_boolean expression s))
+     ((eq? '< (car expression)) (M_boolean expression s))
+     ((eq? '> (car expression)) (M_boolean expression s))
+     ((eq? '>= (car expression)) (M_boolean expression s))
+     ((eq? '<= (car expression)) (M_boolean expression s))
+     ((eq? '|| (car expression)) (M_boolean expression s))
+     ((eq? '&& (car expression)) (M_boolean expression s))
      (else (M-integer expression s)))))
 
 (define M_declaration
@@ -101,17 +112,17 @@
 (define M_boolean
   (lambda (condition state)
     (cond
-      ((eq? condition #t) #t)
-      ((eq? condition #f) #f)
-      ((eq? '== (car condition)) (if(eq? (M_value (cadr condition) state) (M_value (caddr condition) state)) #t #f))
-      ((eq? '!= (car condition)) (if(eq? (M_value (cadr condition) state) (M_value (caddr condition) state)) #f #t))
-      ((eq? '< (car condition)) (if(< (M_value(cadr condition) state) (M_value (caddr condition) state)) #t #f))
-      ((eq? '> (car condition)) (if(> (M_value (cadr condition) state) (M_value (caddr condition) state)) #t #f))
-      ((eq? '<= (car condition)) (if(<= (M_value (cadr condition) state) (M_value (caddr condition) state)) #t #f))
-      ((eq? '>= (car condition)) (if(>= (cadr condition) (caddr condition)) #t #f))
-      ((eq? '&& (car condition)) (if(M_boolean (cadr condition) state) (if(M_boolean (caddr condition) state) #t #f) #f))
-      ((eq? '|| (car condition)) (if(M_boolean (cadr condition) state) #t (if(M_boolean (caddr condition) state) #t #f)))
-      ((eq? '! (car condition)) (if(M_boolean (cadr condition) state) #f #t))
+      ((eq? condition 'true) 'true)
+      ((eq? condition 'false) 'false)
+      ((eq? '== (car condition)) (if(eq? (M_value (cadr condition) state) (M_value (caddr condition) state)) 'true 'false))
+      ((eq? '!= (car condition)) (if(eq? (M_value (cadr condition) state) (M_value (caddr condition) state)) 'false 'true))
+      ((eq? '< (car condition)) (if(< (M_value(cadr condition) state) (M_value (caddr condition) state)) 'true 'false))
+      ((eq? '> (car condition)) (if(> (M_value (cadr condition) state) (M_value (caddr condition) state)) 'true 'false))
+      ((eq? '<= (car condition)) (if(<= (M_value (cadr condition) state) (M_value (caddr condition) state)) 'true 'false))
+      ((eq? '>= (car condition)) (if(>= (cadr condition) (caddr condition)) 'true 'false))
+      ((eq? '&& (car condition))(if(eq? 'true (M_value (cadr condition) state)) (if(eq? 'true (M_value (caddr condition) state)) 'true 'false) 'false))
+      ((eq? '|| (car condition))(if(eq? 'true (M_value (cadr condition) state)) 'true (if(eq? 'true (M_value (cadr condition) state)) 'true 'false)))
+      ((eq? '! (car condition)) (if(eq? 'true (M_value (cadr condition) state)) 'false 'true))
        )))
 
 ;state abstractions 
